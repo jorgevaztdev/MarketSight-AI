@@ -55,14 +55,6 @@ const getMonthlyFeatureData = (releases: FeatureRelease[]) => {
 };
 
 
-const chartConfigTemplate = competitorNames.reduce((acc, name, index) => {
-  acc[name] = {
-    label: name,
-    color: `hsl(var(--chart-${(index % 5) + 1}))`,
-  };
-  return acc;
-}, {} as ChartConfig);
-
 const competitorNames = Array.from(new Set(mockFeatureReleases.map(r => r.competitorName)));
 
 
