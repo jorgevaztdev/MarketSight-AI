@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -14,6 +15,7 @@ import type { AlertInfo } from "@/types";
 import { Loader2, AlertTriangle, CheckCircle2, Info, Wand2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import ClientOnlyLocalDateString from "@/components/util/ClientOnlyLocalDateString";
 
 const mockAlerts: AlertInfo[] = [
   { id: "alert1", timestamp: new Date(Date.now() - 86400000).toISOString(), competitorName: "AI Solutions Inc.", changeType: "PRICE", summary: "Pro plan increased by $10/mo.", significance: "High", details: "Previous price: $199/mo, New Price: $209/mo" },
@@ -169,7 +171,7 @@ export default function AlertsPage() {
                     <TableBody>
                         {mockAlerts.map(alert => (
                             <TableRow key={alert.id}>
-                                <TableCell className="text-xs">{new Date(alert.timestamp).toLocaleDateString()}</TableCell>
+                                <TableCell><ClientOnlyLocalDateString isoDateString={alert.timestamp} className="text-xs" /></TableCell>
                                 <TableCell>{alert.competitorName}</TableCell>
                                 <TableCell><Badge variant="outline">{alert.changeType}</Badge></TableCell>
                                 <TableCell className="text-sm">{alert.summary}</TableCell>

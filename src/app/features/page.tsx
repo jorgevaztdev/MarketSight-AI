@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -16,6 +17,7 @@ import type { FeatureRelease } from "@/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import ClientOnlyLocalDateString from "@/components/util/ClientOnlyLocalDateString";
 
 const mockFeatureReleases: FeatureRelease[] = [
   { id: "fr1", competitorName: "AI Solutions Inc.", date: "2023-10-15T00:00:00Z", featureName: "New Dashboard UI", scope: "major", description: "Revamped user interface for better experience." },
@@ -29,25 +31,31 @@ const mockFeatureReleases: FeatureRelease[] = [
 // Aggregate data for chart: count features per competitor per month
 const getMonthlyFeatureData = (releases: FeatureRelease[]) => {
   const monthlyData: { [monthYear: string]: { name: string; [competitor: string]: number } } = {};
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   releases.forEach(release => {
     const date = new Date(release.date);
-    const monthYear = `${date.toLocaleString('default', { month: 'short' })} ${date.getFullYear()}`;
+    // Use UTC methods to ensure consistency for month/year extraction
+    const month = monthNames[date.getUTCMonth()];
+    const year = date.getUTCFullYear();
+    const monthYear = `${month} ${year}`;
     
     if (!monthlyData[monthYear]) {
       monthlyData[monthYear] = { name: monthYear };
     }
     monthlyData[monthYear][release.competitorName] = (monthlyData[monthYear][release.competitorName] || 0) + 1;
   });
-
-  return Object.values(monthlyData).sort((a, b) => new Date(a.name).getTime() - new Date(b.name).getTime());
+  
+  // Sort by date after aggregation
+  return Object.values(monthlyData).sort((a, b) => {
+    const dateA = new Date(a.name.replace(/(\w{3}) (\d{4})/, "$1 1, $2")); // Format for Date constructor
+    const dateB = new Date(b.name.replace(/(\w{3}) (\d{4})/, "$1 1, $2"));
+    return dateA.getTime() - dateB.getTime();
+  });
 };
 
-const aggregatedFeatureData = getMonthlyFeatureData(mockFeatureReleases);
 
-const competitorNames = Array.from(new Set(mockFeatureReleases.map(r => r.competitorName)));
-
-const chartConfig = competitorNames.reduce((acc, name, index) => {
+const chartConfigTemplate = competitorNames.reduce((acc, name, index) => {
   acc[name] = {
     label: name,
     color: `hsl(var(--chart-${(index % 5) + 1}))`,
@@ -55,9 +63,25 @@ const chartConfig = competitorNames.reduce((acc, name, index) => {
   return acc;
 }, {} as ChartConfig);
 
+const competitorNames = Array.from(new Set(mockFeatureReleases.map(r => r.competitorName)));
+
 
 export default function FeaturesPage() {
   const [visibleReleases, setVisibleReleases] = React.useState(5);
+  
+  const aggregatedFeatureData = React.useMemo(() => getMonthlyFeatureData(mockFeatureReleases), []);
+  
+  const chartConfig = React.useMemo(() => {
+    return competitorNames.reduce((acc, name, index) => {
+      acc[name] = {
+        label: name,
+        color: `hsl(var(--chart-${(index % 5) + 1}))`,
+      };
+      return acc;
+    }, {} as ChartConfig);
+  }, []);
+
+
   const sortedReleases = React.useMemo(() => 
     [...mockFeatureReleases].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()), 
   []);
@@ -90,7 +114,7 @@ export default function FeaturesPage() {
                   />
                   <Legend content={<ChartLegendContent />} />
                   {competitorNames.map(name => (
-                    <Bar key={name} dataKey={name} fill={chartConfig[name].color} radius={[4, 4, 0, 0]} />
+                    <Bar key={name} dataKey={name} fill={chartConfig[name]?.color || `hsl(var(--chart-1))`} radius={[4, 4, 0, 0]} />
                   ))}
                 </BarChart>
               </ResponsiveContainer>
@@ -117,7 +141,7 @@ export default function FeaturesPage() {
               <TableBody>
                 {sortedReleases.slice(0, visibleReleases).map((release) => (
                   <TableRow key={release.id}>
-                    <TableCell>{new Date(release.date).toLocaleDateString()}</TableCell>
+                    <TableCell><ClientOnlyLocalDateString isoDateString={release.date} /></TableCell>
                     <TableCell>{release.competitorName}</TableCell>
                     <TableCell className="font-medium">{release.featureName}</TableCell>
                     <TableCell>
@@ -149,3 +173,4 @@ export default function FeaturesPage() {
     </>
   );
 }
+

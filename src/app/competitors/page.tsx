@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -5,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import type { CompetitorScrapedData, Feature, PricingPlan, ReleaseNote } from "@/types";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
+import ClientOnlyLocalDateString from "@/components/util/ClientOnlyLocalDateString";
 
 const mockCompetitorsData: CompetitorScrapedData[] = [
   {
@@ -60,7 +62,7 @@ export default function CompetitorsPage() {
                 </a>
               </div>
               <CardDescription className="text-xs mt-1">
-                Last Scraped: {new Date(data.lastScraped).toLocaleDateString()}
+                Last Scraped: <ClientOnlyLocalDateString isoDateString={data.lastScraped} />
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
@@ -98,7 +100,7 @@ export default function CompetitorsPage() {
                       {data.releaseNotes.slice(0,2).map(note => (
                         <li key={note.id}>
                           <p className="font-medium">{note.title} <span className="text-xs text-muted-foreground">({note.version})</span></p>
-                          <p className="text-xs text-muted-foreground">{new Date(note.date).toLocaleDateString()}</p>
+                          <p className="text-xs text-muted-foreground"><ClientOnlyLocalDateString isoDateString={note.date} /></p>
                         </li>
                       ))}
                     </ul>
