@@ -15,6 +15,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import type { FeatureRelease } from "@/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const mockFeatureReleases: FeatureRelease[] = [
   { id: "fr1", competitorName: "AI Solutions Inc.", date: "2023-10-15T00:00:00Z", featureName: "New Dashboard UI", scope: "major", description: "Revamped user interface for better experience." },
