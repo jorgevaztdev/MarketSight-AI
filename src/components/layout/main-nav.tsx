@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -37,9 +38,8 @@ export function MainNav() {
       <SidebarMenu className="flex-1 p-2">
         {NAV_ITEMS.map((item) => (
           <SidebarMenuItem key={item.href}>
-            <Link href={item.href} passHref legacyBehavior>
+            <Link href={item.href}>
               <SidebarMenuButton
-                asChild
                 isActive={pathname === item.href}
                 tooltip={{ children: item.title, className: "text-xs" }}
                 className={cn(
@@ -47,10 +47,8 @@ export function MainNav() {
                   state === "collapsed" && "justify-center"
                 )}
               >
-                <a>
-                  <item.icon className="shrink-0" />
-                  <span className={cn(state === "collapsed" ? "sr-only" : "")}>{item.title}</span>
-                </a>
+                <item.icon className="shrink-0" />
+                <span className={cn(state === "collapsed" ? "sr-only" : "")}>{item.title}</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
